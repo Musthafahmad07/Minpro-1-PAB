@@ -1,68 +1,107 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../model/buku.dart';
 import 'halaman_form.dart';
+import 'halaman_tentang.dart';
 
-class HalamanUtama extends StatelessWidget {
+class HalamanUtama extends StatefulWidget {
   const HalamanUtama({super.key});
 
-  static ValueNotifier<List<Buku>> daftarBuku =
-      ValueNotifier([]);
+  @override
+  State<HalamanUtama> createState() => _HalamanUtamaState();
+}
+
+class _HalamanUtamaState extends State<HalamanUtama> {
+  List<Buku> daftarBuku = [];
 
   void tambahBuku(Buku buku) {
-    daftarBuku.value = [...daftarBuku.value, buku];
+    setState(() {
+      daftarBuku.add(buku);
+    });
+  }
+
+  void updateBuku(int index, Buku bukuBaru) {
+    setState(() {
+      daftarBuku[index] = bukuBaru;
+    });
   }
 
   void hapusBuku(int index) {
-    final list = [...daftarBuku.value];
-    list.removeAt(index);
-    daftarBuku.value = list;
+    setState(() {
+      daftarBuku.removeAt(index);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Manajemen Perpustakaan"),
-      ),
-      body: ValueListenableBuilder<List<Buku>>(
-        valueListenable: daftarBuku,
-        builder: (context, bukuList, _) {
-          if (bukuList.isEmpty) {
-            return const Center(
-              child: Text("Belum ada data buku"),
-            );
-          }
+      appBar: AppBar(title: const Text("Manajemen Perpustakaan")),
 
-          return ListView.builder(
-            itemCount: bukuList.length,
-            itemBuilder: (context, index) {
-              return Card(
-                child: ListTile(
-                  title: Text(bukuList[index].judul),
-                  subtitle: Text(
-                      "${bukuList[index].pengarang} - ${bukuList[index].tahun}"),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: () => hapusBuku(index),
-                  ),
+      body: ListView.builder(
+        itemCount: daftarBuku.length,
+        itemBuilder: (context, index) {
+          final buku = daftarBuku[index];
+          return ListTile(
+            title: Text(buku.judul),
+            subtitle: Text("${buku.pengarang} - ${buku.tahun}"),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () {
+                    Get.to(
+                      () => HalamanForm(
+                        buku: buku,
+                        saatSimpan: (bukuBaru) {
+                          updateBuku(index, bukuBaru);
+                        },
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
+                IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: () {
+                    hapusBuku(index);
+                  },
+                ),
+              ],
+            ),
           );
         },
       ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => HalamanForm(
-                saatSimpan: tambahBuku,
-              ),
+          Get.to(
+            () => HalamanForm(
+              saatSimpan: (bukuBaru) {
+                tambahBuku(bukuBaru);
+              },
             ),
           );
         },
         child: const Icon(Icons.add),
+      ),
+
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+
+      bottomNavigationBar: BottomAppBar(
+        child: SizedBox(
+          height: 60,
+          child: Center(
+            child: TextButton(
+              onPressed: () {
+                Get.to(HalamanTentang());
+              },
+              child: Text(
+                "Tentang",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
