@@ -1,0 +1,91 @@
+import 'package:flutter/material.dart';
+import '../model/buku.dart';
+import 'halaman_form.dart';
+
+class HalamanUtama extends StatefulWidget {
+  const HalamanUtama({super.key});
+
+  @override
+  State<HalamanUtama> createState() => _HalamanUtamaState();
+}
+
+class _HalamanUtamaState extends State<HalamanUtama> {
+  List<Buku> daftarBuku = [];
+
+  void tambahBuku(Buku buku) {
+    setState(() {
+      daftarBuku.add(buku);
+    });
+  }
+
+  void updateBuku(int index, Buku bukuBaru) {
+    setState(() {
+      daftarBuku[index] = bukuBaru;
+    });
+  }
+
+  void hapusBuku(int index) {
+    setState(() {
+      daftarBuku.removeAt(index);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Manajemen Perpustakaan"),
+      ),
+      body: ListView.builder(
+        itemCount: daftarBuku.length,
+        itemBuilder: (context, index) {
+          final buku = daftarBuku[index];
+          return ListTile(
+            title: Text(buku.judul),
+            subtitle: Text("${buku.pengarang} - ${buku.tahun}"),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => HalamanForm(
+                          buku: buku,
+                          saatSimpan: (bukuBaru) {
+                            updateBuku(index, bukuBaru);
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: () {
+                    hapusBuku(index);
+                  },
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => HalamanForm(
+                saatSimpan: tambahBuku,
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
