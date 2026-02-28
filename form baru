@@ -1,0 +1,87 @@
+import 'package:flutter/material.dart';
+import '../model/buku.dart';
+
+class HalamanForm extends StatefulWidget {
+  final Function(Buku) saatSimpan;
+  final Buku? buku; // null = tambah, ada isi = edit
+
+  const HalamanForm({super.key, required this.saatSimpan, this.buku});
+
+  @override
+  State<HalamanForm> createState() => _HalamanFormState();
+}
+
+class _HalamanFormState extends State<HalamanForm> {
+  final _formKey = GlobalKey<FormState>();
+
+  late TextEditingController controllerJudul;
+  late TextEditingController controllerPengarang;
+  late TextEditingController controllerTahun;
+
+  @override
+  void initState() {
+    super.initState();
+    controllerJudul =
+        TextEditingController(text: widget.buku?.judul ?? '');
+    controllerPengarang =
+        TextEditingController(text: widget.buku?.pengarang ?? '');
+    controllerTahun =
+        TextEditingController(text: widget.buku?.tahun ?? '');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.buku == null ? "Tambah Buku" : "Edit Buku"),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              TextFormField(
+                controller: controllerJudul,
+                decoration: const InputDecoration(labelText: "Judul Buku"),
+                validator: (value) =>
+                    value!.isEmpty ? "Tidak boleh kosong" : null,
+              ),
+              TextFormField(
+                controller: controllerPengarang,
+                decoration:
+                    const InputDecoration(labelText: "Nama Pengarang"),
+                validator: (value) =>
+                    value!.isEmpty ? "Tidak boleh kosong" : null,
+              ),
+              TextFormField(
+                controller: controllerTahun,
+                decoration:
+                    const InputDecoration(labelText: "Tahun"),
+                keyboardType: TextInputType.number,
+                validator: (value) =>
+                    value!.isEmpty ? "Tidak boleh kosong" : null,
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    widget.saatSimpan(
+                      Buku(
+                        judul: controllerJudul.text,
+                        pengarang: controllerPengarang.text,
+                        tahun: controllerTahun.text,
+                      ),
+                    );
+                    Navigator.pop(context);
+                  }
+                },
+                child: Text(widget.buku == null ? "Simpan" : "Update"),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
