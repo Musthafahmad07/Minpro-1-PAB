@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'halaman/halaman_utama.dart';
 
 void main() {
-  runApp(AplikasiPerpustakaan());
+  runApp(const AplikasiPerpustakaan());
 }
 
 class AplikasiPerpustakaan extends StatelessWidget {
@@ -10,10 +11,10 @@ class AplikasiPerpustakaan extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Manajemen Perpustakaan',
-      home: HalamanUtama(),
+      home: const HalamanUtama(),
     );
   }
 }
